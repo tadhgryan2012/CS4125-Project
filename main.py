@@ -4,17 +4,47 @@ from embeddings import *
 from modelling.modelling import *
 from modelling.data_model import *
 import random
-seed =0
+from sklearn.feature_extraction.text import TfidfVectorizer
+seed = 0
 random.seed(seed)
 np.random.seed(seed)
 
+def de_duplication(df: pd.DataFrame):
+    """Remove duplicate rows."""
+    print("Removing duplicate rows...")
+    df = df.drop_duplicates()
+    return df
+
+def noise_remover(df: pd.DataFrame):
+    """Clean noise from all text columns."""
+    print("Removing noise from all columns...")
+    for col in df.select_dtypes(include='object'):  # Only process string columns
+        df[col] = df[col].str.replace(r'[^\w\s]', '', regex=True).str.strip()
+    return df
+
+def translate_to_en(text_list: list):
+    """Translate a list of text strings to English."""
+    print("Translating text list to English...")
+    # TODO - Add access to translate API to actually translate text
+    translated_list = [f"Translated({text})" if isinstance(text, str) else text for text in text_list]
+    return translated_list
+
+def get_tfidf_embd(df: pd.DataFrame):
+    """Generate TF-IDF embeddings for all text columns."""
+    print("Generating TF-IDF embeddings for all text columns...")
+    vectorizer = TfidfVectorizer()
+    tfidf_matrices = {}
+    for col in df.select_dtypes(include='object'):  # Only process string columns
+        tfidf_matrix = vectorizer.fit_transform(df[col].fillna(''))
+        tfidf_matrices[col] = tfidf_matrix
+    return tfidf_matrices
 
 def load_data():
-    #load the input data
-    df = get_input_data()
-    return  df
+    print("get_input_data()")
+    data = pd.read_csv('data/AppGallery.csv')
+    return data
 
-def preprocess_data(df):
+def preprocess_data(df: pd.DataFrame):
     # De-duplicate input data
     df =  de_duplication(df)
     # remove noise in input data
@@ -47,4 +77,3 @@ if __name__ == '__main__':
     data = get_data_object(X, df)
     # modelling
     perform_modelling(data, df, 'name')
-

@@ -14,7 +14,7 @@ class Data():
                  df: pd.DataFrame) -> None:
                  # This method will create the model for data
                  #This will be performed in second activity
-
+        print("Data.__init__()")
 
     def get_type(self):
         return  self.y
