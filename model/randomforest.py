@@ -28,14 +28,23 @@ class RandomForest(BaseModel):
         self.data_transform()
 
     def train(self, data) -> None:
-        self.mdl = self.mdl.fit(data.X_train, data.y_train)
+        self.mdl = self.mdl.fit(data.get_X_train(), data.get_type_y_train())
 
     def predict(self, X_test: pd.Series):
-        predictions = self.mdl.predict(X_test)
-        self.predictions = predictions
+    
+        if self.mdl is None:
+            raise ValueError("The model has not been trained yet. Train the model before calling predict().")
+
+        self.predictions = self.mdl.predict(X_test)  # Generate predictions
+        return self.predictions  #returns predictions
 
     def print_results(self, data):
-        print(classification_report(data.y_test, self.predictions))
+   
+        if self.predictions is None:
+            raise ValueError("No predictions available. Call predict() first.")
+    
+        print("RandomForest Evaluation:")
+        print(classification_report(data.get_type_y_test(), self.predictions))
 
 
     def data_transform(self) -> None:
