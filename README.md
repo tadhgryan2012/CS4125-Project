@@ -8,7 +8,7 @@ Implement key software engineering principles, such as design patterns, Separati
 
 Project Contributors:
   Tadhg Ryan (21310408)
-  Syzmon Szulc ()
+  Syzmon Szulc (21323208)
   Boris Bobylkov ()
   Craig Phayer ()
   Liam Murray ()

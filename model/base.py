@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 import numpy as np
+import utils
 
 
 class BaseModel(ABC):

@@ -54,26 +54,82 @@ def preprocess_data(df: pd.DataFrame):
     return df
 
 def get_embeddings(df:pd.DataFrame):
-    X = get_tfidf_embd(df)  # get tf-idf embeddings
+    vectorizer = TfidfVectorizer()
+
+    # Generate embeddings only for non-null rows
+    valid_indices = df[Config.INTERACTION_CONTENT].notnull()
+    df = df[valid_indices]
+    X = vectorizer.fit_transform(df[Config.INTERACTION_CONTENT].fillna('')).toarray()
+    
+    print(f"Embeddings shape: {X.shape}, DataFrame shape: {df.shape}")
     return X, df
 
 def get_data_object(X: np.ndarray, df: pd.DataFrame):
     return Data(X, df)
 
+
+
 def perform_modelling(data: Data, df: pd.DataFrame, name):
-    model_predict(data, df, name)
+    """
+    Perform model prediction, evaluation, and optionally save predictions.
+    """
+    print("Starting perform_modelling...")
+    
+    # Train and predict
+    predictions, model = model_predict(data, df, name)
+    
+    # Evaluate the model
+    print("Evaluating the model...")
+    model_evaluate(model, data)
+    
+    # Save predictions to a file
+    save_predictions(data.get_test_df(), predictions)
+    print("Modeling and evaluation completed.")
+
+# This is for saving predictions into predictions.csv - can help create reports w model perf.
+def save_predictions(df, predictions, output_path="predictions.csv"):
+    """
+    Save predictions to a CSV file.
+    """
+    # Use the test DataFrame to align predictions
+    test_df = df.iloc[df.index.isin(data.get_test_df().index)]
+    test_df['Predictions'] = predictions
+    
+    # Save to CSV
+    test_df.to_csv(output_path, index=False)
+    print(f"Predictions saved to {output_path}.")
+
+
 # Code will start executing from following line
 if __name__ == '__main__':
     
     # pre-processing steps
     df = load_data()
+    print("Columns in the dataset:", df.columns)
+    print(f"Loaded data shape: {df.shape}")
+    
     df = preprocess_data(df)
+    print("After preprocessing:")
+    print(f"Shape of df: {df.shape}")
+    print(f"Columns in df: {df.columns}")
+    print(f"Non-null target column '{Config.CLASS_COL}': {df[Config.CLASS_COL].notnull().sum()}")
+
     df[Config.INTERACTION_CONTENT] = df[Config.INTERACTION_CONTENT].values.astype('U')
     df[Config.TICKET_SUMMARY] = df[Config.TICKET_SUMMARY].values.astype('U')
     
     # data transformation
     X, group_df = get_embeddings(df)
+    print("After generating embeddings:")
+    print(f"Shape of embeddings (X): {X.shape}")
+    print(f"Shape of df after alignment: {df.shape}")
+    print(f"Columns in df after alignment: {df.columns}")
+
     # data modelling
     data = get_data_object(X, df)
+    print("After creating Data object:")
+    print(f"Train embeddings shape: {data.get_X_train().shape}, Test embeddings shape: {data.get_X_test().shape}")
+    print(f"Train labels shape: {data.get_type_y_train().shape}, Test labels shape: {data.get_type_y_test().shape}")
+    print(f"Train DataFrame shape: {data.get_train_df().shape}, Test DataFrame shape: {data.get_test_df().shape}")
+    
     # modelling
-    perform_modelling(data, df, 'name')
+    perform_modelling(data, df, 'random_forest')
