@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from Config import *
-from utils import *
+from Utils import *
 import random
 seed =0
 random.seed(seed)
