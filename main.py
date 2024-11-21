@@ -1,5 +1,5 @@
 #This is a main file: The controller. All methods will directly on directly be called here
-from preprocess import *
+from preprocess1 import *
 from embeddings import *
 # from modelling.modelling import *
 from modelling.ModelFactory import ModelFactory
