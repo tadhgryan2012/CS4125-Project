@@ -35,9 +35,7 @@ class RandomForest(BaseModel):
         if self.mdl is None:
             raise ValueError("The model has not been trained yet. Train the model before calling predict().")
 
-        print(f"Making predictions with RandomForest model on data of shape: {X_test.shape}")
         self.predictions = self.mdl.predict(X_test)  # Generate predictions
-        print(f"Predictions generated: {self.predictions}")
         return self.predictions  #returns predictions
 
     def print_results(self, data):

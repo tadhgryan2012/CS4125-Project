@@ -105,31 +105,17 @@ if __name__ == '__main__':
     
     # pre-processing steps
     df = load_data()
-    print("Columns in the dataset:", df.columns)
-    print(f"Loaded data shape: {df.shape}")
     
     df = preprocess_data(df)
-    print("After preprocessing:")
-    print(f"Shape of df: {df.shape}")
-    print(f"Columns in df: {df.columns}")
-    print(f"Non-null target column '{Config.CLASS_COL}': {df[Config.CLASS_COL].notnull().sum()}")
 
     df[Config.INTERACTION_CONTENT] = df[Config.INTERACTION_CONTENT].values.astype('U')
     df[Config.TICKET_SUMMARY] = df[Config.TICKET_SUMMARY].values.astype('U')
     
     # data transformation
     X, group_df = get_embeddings(df)
-    print("After generating embeddings:")
-    print(f"Shape of embeddings (X): {X.shape}")
-    print(f"Shape of df after alignment: {df.shape}")
-    print(f"Columns in df after alignment: {df.columns}")
 
     # data modelling
     data = get_data_object(X, df)
-    print("After creating Data object:")
-    print(f"Train embeddings shape: {data.get_X_train().shape}, Test embeddings shape: {data.get_X_test().shape}")
-    print(f"Train labels shape: {data.get_type_y_train().shape}, Test labels shape: {data.get_type_y_test().shape}")
-    print(f"Train DataFrame shape: {data.get_train_df().shape}, Test DataFrame shape: {data.get_test_df().shape}")
     
     # modelling
     perform_modelling(data, df, 'random_forest')
