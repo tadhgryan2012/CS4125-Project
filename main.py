@@ -3,11 +3,16 @@ from preprocess import *
 from embeddings import *
 from modelling.modelling import *
 from modelling.data_model import *
+from CLI.menus import *
+from CLI.timeFormatter import *
 import random
 from sklearn.feature_extraction.text import TfidfVectorizer
 seed = 0
 random.seed(seed)
 np.random.seed(seed)
+
+excel_serial_date("2024-01-01-01-01-01")
+main_menu() 
 
 def de_duplication(df: pd.DataFrame):
     """Remove duplicate rows."""
