@@ -1,4 +1,10 @@
 from model.RandomForest import RandomForest
+from model.LogisticRegression import LogisticRegression
+from model.GradientBoosting import GradientBoosting
+from model.SVM import SVM
+from model.KNN import KNN
+from model.NaiveBayes import NaiveBayes
+
 from modelling.data_model import Data
 import numpy as np
 
@@ -17,6 +23,12 @@ class ModelFactory:
         # Maps bitmask to corresponding model
         self.model_map = {
             0b001: RandomForest,
+            0b010: LogisticRegression,
+            0b011: SVM,
+            0b100: GradientBoosting,
+            0b101: KNN,
+            0b110: NaiveBayes,
+
         }
         self.model = None
 
@@ -66,6 +78,6 @@ class ModelFactory:
         """
         if self.model is None:
             raise ValueError("No model created. Use 'create_model' first.")
-        predictions = self.model.predict(data.get_X_test)
+        predictions = self.model.predict(data)
         print(f"Predictions: {predictions}")
         return predictions

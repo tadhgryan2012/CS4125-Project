@@ -77,7 +77,7 @@ def perform_modelling(name: int, data: Data):
     modelFactory = ModelFactory()
     modelFactory.create_model(name)
     modelFactory.train_evaluate(data)
-    # modelFactory.predict(data)
+    modelFactory.predict(data)
 
 # This is for saving predictions into predictions.csv - can help create reports w model perf.
 def save_predictions(df, predictions, output_path="predictions.csv"):
