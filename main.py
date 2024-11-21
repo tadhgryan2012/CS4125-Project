@@ -1,7 +1,8 @@
 #This is a main file: The controller. All methods will directly on directly be called here
 from preprocess.preprocess import *
 from embeddings import *
-from modelling.modelling import *
+# from modelling.modelling import *
+from modelling.ModelFactory import ModelFactory
 from modelling.data_model import *
 import random
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -60,22 +61,14 @@ def get_data_object(X: np.ndarray, df: pd.DataFrame):
 
 
 
-def perform_modelling(data: Data, df: pd.DataFrame, name):
+def perform_modelling(name: int, data: Data):
     """
     Perform model prediction, evaluation, and optionally save predictions.
     """
-    print("Starting perform_modelling...")
-    
-    # Train and predict
-    predictions, model = model_predict(data, df, name)
-    
-    # Evaluate the model
-    print("Evaluating the model...")
-    model_evaluate(model, data)
-    
-    # Save predictions to a file
-    save_predictions(data.get_test_df(), predictions)
-    print("Modeling and evaluation completed.")
+    modelFactory = ModelFactory()
+    modelFactory.create_model(name)
+    modelFactory.train_evaluate(data)
+    # modelFactory.predict(data)
 
 # This is for saving predictions into predictions.csv - can help create reports w model perf.
 def save_predictions(df, predictions, output_path="predictions.csv"):
@@ -93,7 +86,6 @@ def save_predictions(df, predictions, output_path="predictions.csv"):
 
 # Code will start executing from following line
 if __name__ == '__main__':
-    
     # pre-processing steps
     df = load_data()
     
@@ -109,4 +101,4 @@ if __name__ == '__main__':
     data = get_data_object(X, df)
     
     # modelling
-    perform_modelling(data, df, 'random_forest')
+    perform_modelling(0b001, data)
