@@ -8,6 +8,7 @@ from CLI.menus import *
 from CLI.timeFormatter import *
 import random
 from sklearn.feature_extraction.text import TfidfVectorizer
+
 seed = 0
 random.seed(seed)
 np.random.seed(seed)
@@ -48,6 +49,15 @@ def get_tfidf_embd(df: pd.DataFrame):
 def load_data():
     print("get_input_data()")
     data = pd.read_csv('data/AppGallery.csv')
+    return data
+
+def load_original_data():
+    print("get_input_data()")
+    data = pd.read_csv('data/AppGallery.csv')
+    return data
+
+def load_processed_data():
+    data = pd.read_csv('data/AppGallery_processed.csv')
     return data
 
 def get_embeddings(df:pd.DataFrame):

@@ -1,6 +1,9 @@
+import os
 from CLI.classification_process import *
 from modelling.data_model import *
 from modelling.ModelFactory import *
+from preprocess import *
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 def main_menu():
     
@@ -8,22 +11,54 @@ def main_menu():
     
     while run:
         print("\nMain Menu")
-        print("1) Train a model")
-        print("2) Classify an email")
-        print("3) Exit")
+        print("1) Preprocess the Data")
+        print("2) Train a model")
+        print("3) Classify an email")
+        print("4) Exit")
         try:
             choice = int(input("Enter your choice : "))
             match choice:
                 case 1: 
-                    train_menu()
+                    preprocess_menu()
                 case 2:
-                    classify_menu()
+                    train_menu()
                 case 3:
+                    classify_menu()
+                case 4:
                     run = False
                 case _:
                     print("Not a valid choice! Try again. (1,2,3): ")
         except ValueError:
             print("WTF")
+
+def preprocess_menu():
+    run = True
+    while run:
+        print("\nPreprocess Menu")
+        print("preprocess strategies to add:")
+        print("1) Noise Removal")
+        print("2) Deduplication Removal")
+        print("3) Translation")
+        print("4) Back to main menu")
+
+        df = load_data()
+
+        choice = int(input("Enter your choice : "))
+        match choice:
+            case 1: 
+                strategy = [NoiseRemovalStrategy()]
+                df = preprocess_data(df, strategy)
+            case 2: 
+                strategy = [DeduplicationStrategy()]
+                df = preprocess_data(df, strategy)
+            case 3: 
+                strategy = [TranslationStrategy()]
+                df = preprocess_data(df, strategy)
+            case 4:
+                run = False
+            case _:
+                print("Not a valid choice! Try again. (1,2,3): ")
+
 
 def train_menu():
     run = True
@@ -33,11 +68,11 @@ def train_menu():
 
         choice = moodel_selection()
 
-        if "7" in choice.split():
+        if "8" in choice.split():
             run = False
             continue
 
-        if "6" in choice.split():
+        if "7" in choice.split():
             print("Training all models...")
             train_choice(0b11111)  # All bits set
             continue
@@ -45,6 +80,25 @@ def train_menu():
         choice_bitmask = choice_to_bitmask(choice)
         train_choice(choice_bitmask)
         main_menu()
+
+def train_choice(choice_bitmask):
+
+    df = load_data()
+
+    X,df = get_embeddings(df)
+
+    data = get_data_object(X,df)
+
+    factory = ModelFactory() 
+
+    for i in range(5):
+        print(i)
+        if choice_bitmask & (1 << i): 
+            print(f"Training Model {i + 1}...")
+            factory.create_model(1 << i)
+            factory.train_evaluate(data) 
+    
+    print("Training complete!")
 
 def classify_menu():
     print("\nClassify Email Menu")
@@ -63,12 +117,13 @@ def classify_menu():
             print("Invalid input! Please enter a number. (1,2,3)")
 
 
+
 def valid_choices(choice):
     if not choice.strip():
         return False
     try:
         choices = list(map(int, choice.split()))
-        return all(1 <= c <= 7 for c in choices)  # Only allow numbers 1-7
+        return all(1 <= c <= 8 for c in choices)  # Only allow numbers 1-7
     except ValueError:
         return False
 
@@ -84,38 +139,26 @@ def choice_to_bitmask(choice_str):
 
     return bitmask
 
-def train_choice(choice_bitmask):
 
-    data = prepare_data() 
-    
-    factory = ModelFactory() 
-
-    for i in range(5):
-        print(i)
-        if choice_bitmask & (1 << i): 
-            print(f"Training Model {i + 1}...")
-            factory.create_model(1 << i)
-            factory.train_evaluate(data) 
-    
-    print("Training complete!")
 
 def moodel_selection():
 
     run = True
     while run:
 
-        print("1) Model1 (<- add name)")
-        print("2) Model2 (<- add name)")
-        print("3) Model3 (<- add name)")
-        print("4) Model4 (<- add name)")
-        print("5) Model5 (<- add name)")
-        print("6) All models")
-        print("7) Back to main menu")
+        print("1) Random Forest")
+        print("2) Logistic Regression")
+        print("3) SVM")
+        print("4) Gradient Boosting")
+        print("5) KNN")
+        print("6) Naive Bayes")
+        print("7) All models")
+        print("8) Back to main menu")
 
         choice = input("Enter your choices (e.g type: 1 3 5 to choose models 1,3 and 5): ")
 
         if not valid_choices(choice):
-            print("Invalid input! Please enter numbers between 1 and 6 separated by spaces. or 7 on its own")
+            print("Invalid input! Please enter numbers between 1 and 7 separated by spaces. or 8 on its own")
             continue
     
         run = False
@@ -124,13 +167,43 @@ def moodel_selection():
     return choice
 
 
-def prepare_data():
 
-    df = pd.read_csv("data\AppGallery.csv")
-    X = df[['Interaction content', 'Ticket Summary']].values  
-    data = Data(X, df) 
+def load_data():
+    file_path = 'data/AppGallery_processed.csv'
 
+    if os.path.exists(file_path):
+        print("Loading from processed dataframe")
+        df = load_processed_data()
+    else:
+        df = load_original_data()
+        print("Loading from original dataframe")
+
+    return df
+
+def load_original_data():
+    print("get_input_data()")
+    data = pd.read_csv('data/AppGallery.csv')
     return data
+
+def load_processed_data():
+    data = pd.read_csv('data/AppGallery_processed.csv')
+    return data
+
+def get_embeddings(df:pd.DataFrame):
+    vectorizer = TfidfVectorizer()
+
+    # Generate embeddings only for non-null rows
+    valid_indices = df[Config.INTERACTION_CONTENT].notnull()
+    df = df[valid_indices]
+    X = vectorizer.fit_transform(df[Config.INTERACTION_CONTENT].fillna('')).toarray()
+    
+    print(f"Embeddings shape: {X.shape}, DataFrame shape: {df.shape}")
+    return X, df
+
+def get_data_object(X: np.ndarray, df: pd.DataFrame):
+    return Data(X, df)
+
+
 
 # bullshit for testing
 def train_model1():
