@@ -8,9 +8,6 @@ seed = 0
 np.random.seed(seed)
 random.seed(seed)
 
-# This file already contain the code for implementing randomforest model
-# Carefully observe the methods below and try calling them in modelling.py
-
 class RandomForest(BaseModel):
     def __init__(self) -> None:
         super(RandomForest, self).__init__()
@@ -44,5 +41,5 @@ class RandomForest(BaseModel):
         if self.model is None:
             raise ValueError("The model has not been trained yet. Train the model before calling predict().")
 
-        self.predictions = self.model.predict(data.get_X_test())  # Generate predictions
-        return self.predictions  #returns predictions
+        self.predictions = self.model.predict(data.get_X_test())
+        return self.predictions

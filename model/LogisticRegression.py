@@ -2,6 +2,7 @@ from sklearn.linear_model import LogisticRegression
 from model.base import BaseModel
 from modelling.data_model import Data
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+import numpy as np
 
 # This file already contain the code for implementing LogisticRegression model.
 

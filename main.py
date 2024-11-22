@@ -61,32 +61,27 @@ def get_data_object(X: np.ndarray, df: pd.DataFrame):
 
 
 
-def perform_modelling(name: int, data: Data):
+def perform_modelling(bitmask: int, data: Data):
     """
     Perform model prediction, evaluation, and optionally save predictions.
     """
     modelFactory = ModelFactory()
-    modelFactory.create_model(name)
+    modelFactory.create_model(bitmask)
     modelFactory.train_evaluate(data)
     modelFactory.predict(data)
 
-# This is for saving predictions into predictions.csv - can help create reports w model perf.
 def save_predictions(df, predictions, output_path="predictions.csv"):
     """
     Save predictions to a CSV file.
     """
-    # Use the test DataFrame to align predictions
     test_df = df.iloc[df.index.isin(data.get_test_df().index)]
     test_df['Predictions'] = predictions
     
-    # Save to CSV
     test_df.to_csv(output_path, index=False)
     print(f"Predictions saved to {output_path}.")
 
 
-# Code will start executing from following line
 if __name__ == '__main__':
-    # pre-processing steps
     df = load_data()
     
     df = preprocess_data(df)
@@ -94,11 +89,8 @@ if __name__ == '__main__':
     df[Config.INTERACTION_CONTENT] = df[Config.INTERACTION_CONTENT].values.astype('U')
     df[Config.TICKET_SUMMARY] = df[Config.TICKET_SUMMARY].values.astype('U')
     
-    # data transformation
     X, group_df = get_embeddings(df)
 
-    # data modelling
     data = get_data_object(X, df)
     
-    # modelling
-    perform_modelling(0b001, data)
+    perform_modelling(0b111111, data)
