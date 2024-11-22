@@ -2,7 +2,7 @@
 from preprocess import *
 from embeddings import *
 # from modelling.modelling import *
-from modelling.ModelFactory import ModelFactory
+from modelling.ModelFactory import *
 from modelling.data_model import *
 from CLI.menus import *
 from CLI.timeFormatter import *

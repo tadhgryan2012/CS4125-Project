@@ -1,6 +1,6 @@
 # Methods related to data loading and all pre-processing steps will go here
-from strategies import DeduplicationStrategy, NoiseRemovalStrategy, TranslationStrategy
-from decorators import LoggingDecorator
+from preprocess.strategies import DeduplicationStrategy, NoiseRemovalStrategy, TranslationStrategy
+from preprocess.decorators import LoggingDecorator
 from utils.interfaces import PreprocessStrategy
 
 class PreprocessPipeline:

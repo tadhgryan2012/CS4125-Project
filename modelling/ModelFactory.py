@@ -1,4 +1,4 @@
-from model.RandomForest import RandomForest
+from model.randomforest import *
 from model.LogisticRegression import LogisticRegression
 from model.GradientBoosting import GradientBoosting
 from model.SVM import SVM

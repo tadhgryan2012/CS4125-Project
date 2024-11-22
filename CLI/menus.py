@@ -1,4 +1,4 @@
-from CLI import classification_process
+from CLI.classification_process import *
 from modelling.data_model import *
 from modelling.ModelFactory import *
 
@@ -23,7 +23,7 @@ def main_menu():
                 case _:
                     print("Not a valid choice! Try again. (1,2,3): ")
         except ValueError:
-            print("Invalid input! Please enter a number. (1,2,3)")
+            print("WTF")
 
 def train_menu():
     run = True
@@ -35,15 +35,12 @@ def train_menu():
 
         if "7" in choice.split():
             run = False
-            main_menu()
             continue
 
         if "6" in choice.split():
             print("Training all models...")
             train_choice(0b11111)  # All bits set
             continue
-        
-        
         
         choice_bitmask = choice_to_bitmask(choice)
         train_choice(choice_bitmask)
@@ -57,9 +54,9 @@ def classify_menu():
         choice = int(input("Enter your choice : "))
         match choice:
             case 1: 
-                train_menu()
+                create_df_from_input()
             case 2:
-                classify_menu()
+                main_menu()
             case _:
                 print("Not a valid choice! Try again. (1,2,3): ")
     except ValueError:
@@ -83,6 +80,8 @@ def choice_to_bitmask(choice_str):
     for pos in positions:
         bitmask |= (1 << (pos - 1))
 
+    print(bitmask)
+
     return bitmask
 
 def train_choice(choice_bitmask):
@@ -92,7 +91,9 @@ def train_choice(choice_bitmask):
     factory = ModelFactory() 
 
     for i in range(5):
+        print(i)
         if choice_bitmask & (1 << i): 
+            print(f"Training Model {i + 1}...")
             factory.create_model(1 << i)
             factory.train_evaluate(data) 
     
@@ -103,7 +104,7 @@ def moodel_selection():
     run = True
     while run:
 
-        print("\n1) Model1 (<- add name)")
+        print("1) Model1 (<- add name)")
         print("2) Model2 (<- add name)")
         print("3) Model3 (<- add name)")
         print("4) Model4 (<- add name)")
