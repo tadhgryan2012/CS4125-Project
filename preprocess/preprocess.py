@@ -1,6 +1,6 @@
 # Methods related to data loading and all pre-processing steps will go here
-from preprocess.strategies import DeduplicationStrategy, NoiseRemovalStrategy, TranslationStrategy
-from preprocess.decorators import LoggingDecorator
+from .strategies import DeduplicationStrategy, NoiseRemovalStrategy, TranslationStrategy
+from .decorators import LoggingDecorator
 from utils.interfaces import PreprocessStrategy
 
 class PreprocessPipeline:
@@ -19,5 +19,12 @@ def preprocess_data(df):
     pipeline = PreprocessPipeline()
     pipeline.add_strategy(LoggingDecorator(DeduplicationStrategy()))
     pipeline.add_strategy(LoggingDecorator(NoiseRemovalStrategy()))
-    pipeline.add_strategy(LoggingDecorator(TranslationStrategy()))
-    return pipeline.execute(df)
+    #pipeline.add_strategy(LoggingDecorator(TranslationStrategy()))
+
+    processed_data = pipeline.execute(df)
+
+    output_file = "data/AppGallery_processed.csv"
+    processed_data.to_csv(output_file, index=False)
+    print(f"Preprocessed data saved to {output_file}")
+
+    return processed_data
