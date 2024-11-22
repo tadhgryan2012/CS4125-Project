@@ -1,5 +1,5 @@
 #This is a main file: The controller. All methods will directly on directly be called here
-from preprocess import *
+from preprocess.preprocess import *
 from embeddings import *
 from modelling.modelling import *
 from modelling.data_model import *
@@ -43,15 +43,6 @@ def load_data():
     print("get_input_data()")
     data = pd.read_csv('data/AppGallery.csv')
     return data
-
-def preprocess_data(df: pd.DataFrame):
-    # De-duplicate input data
-    df =  de_duplication(df)
-    # remove noise in input data
-    df = noise_remover(df)
-    # translate data to english
-    df[Config.TICKET_SUMMARY] = translate_to_en(df[Config.TICKET_SUMMARY].tolist())
-    return df
 
 def get_embeddings(df:pd.DataFrame):
     vectorizer = TfidfVectorizer()
