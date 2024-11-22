@@ -7,5 +7,5 @@ class Config:
 
     # Type Columns to test
     TYPE_COLS = ['Type 1', 'Type 2', 'Type 3', 'Type 4']
-    CLASS_COL = 'Type 1'  # Set to the broadest classification column
+    CLASS_COL = 'Type 2'  # Set to the broadest classification column
     GROUPED = 'Innso TYPOLOGY_TICKET '
