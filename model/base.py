@@ -1,25 +1,42 @@
 from abc import ABC
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report, confusion_matrix
 from modelling.data_model import Data
+import os
+import joblib
 
 class BaseModel(ABC):
     def __init__(self) -> None:
         """
         Instantiates the Model and compiles.
         """
-        pass
+        self.model = None
 
-    def train(self, data: Data, print_results: bool = True) -> None:
+    def train(self, data: Data, save_path: str = "data/models/trained_model.pkl", retrain: bool = False, print_results: bool = True) -> tuple:
         """
-        Train the model using ML Models for Multi-class and mult-label classification.
-        :params: df is essential, others are model specific
-        :return: classifier
+        Train the model using ML Models for Multi-class and multi-label classification.
+        If a saved model exists, it is loaded instead of training a new one.
+        
+        :param data: The dataset to train and test the model.
+        :param save_path: Path to save or load the trained model.
+        :param print_results: Whether to print evaluation metrics.
+        :return: Tuple containing evaluation metrics (accuracy, precision, recall, f1, classification_report, confusion_matrix).
         """
-        self.model.fit(data.get_X_train(), data.get_type_y_train())
+        # Check if a pre-trained model already exists
+        if not retrain and os.path.exists(save_path):
+            print(f"Loading existing model from {save_path}...")
+            self.model = joblib.load(save_path)
+        else:
+            print("Training new model...")
+            # Train the model
+            self.model.fit(data.get_X_train(), data.get_type_y_train())
 
+            # Save the trained model
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            joblib.dump(self.model, save_path)
+            print(f"Model saved to {save_path}")
+
+        # Evaluate the model
         y_pred = self.model.predict(data.get_X_test())
-         
-        # Get the actual test labels
         y_true = data.get_type_y_test()
         
         # Calculate metrics
@@ -30,17 +47,17 @@ class BaseModel(ABC):
         cr = classification_report(y_true, y_pred, zero_division=1)
         cm = confusion_matrix(y_true, y_pred)
         
-        if (print_results): 
+        # Print results
+        if print_results: 
             print(f"Model accuracy: {accuracy:.2f}")
             print(f"Model precision: {precision:.2f}")
             print(f"Model recall: {recall:.2f}")
             print(f"Model F1-score: {f1:.2f}")
-        
             print("\nClassification Report:")
             print(cr)
-            
             print("\nConfusion Matrix:")
             print(cm)
+        
         return accuracy, precision, recall, f1, cr, cm
 
     def predict(self, data: Data):
