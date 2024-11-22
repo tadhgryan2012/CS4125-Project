@@ -15,11 +15,11 @@ class PreprocessPipeline:
             df = strat.execute(df)
         return df
 
-def preprocess_data(df):
+def preprocess_data(df, strategy):
     pipeline = PreprocessPipeline()
-    pipeline.add_strategy(LoggingDecorator(DeduplicationStrategy()))
-    pipeline.add_strategy(LoggingDecorator(NoiseRemovalStrategy()))
-    #pipeline.add_strategy(LoggingDecorator(TranslationStrategy()))
+
+    for strat in strategy:
+        pipeline.add_strategy(LoggingDecorator(strat))
 
     processed_data = pipeline.execute(df)
 
