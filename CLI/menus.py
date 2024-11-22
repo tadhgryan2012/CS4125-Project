@@ -1,4 +1,6 @@
 from CLI import classification_process
+from modelling.data_model import *
+from modelling.ModelFactory import *
 
 def main_menu():
     
@@ -51,6 +53,18 @@ def classify_menu():
     print("\nClassify Email Menu")
     print("1) Start email classification process")
     print("2) Back to main menu")
+    try:
+        choice = int(input("Enter your choice : "))
+        match choice:
+            case 1: 
+                train_menu()
+            case 2:
+                classify_menu()
+            case _:
+                print("Not a valid choice! Try again. (1,2,3): ")
+    except ValueError:
+            print("Invalid input! Please enter a number. (1,2,3)")
+
 
 def valid_choices(choice):
     if not choice.strip():
@@ -72,18 +86,16 @@ def choice_to_bitmask(choice_str):
     return bitmask
 
 def train_choice(choice_bitmask):
-    train_functions = {
-        0: train_model1,
-        1: train_model2,
-        2: train_model3,
-        3: train_model4,
-        4: train_model5
-    }
 
-    print("Training selected models...")
-    for i in range(5):  
-        if choice_bitmask & (1 << i):  
-            train_functions[i]()  
+    data = prepare_data() 
+    
+    factory = ModelFactory() 
+
+    for i in range(5):
+        if choice_bitmask & (1 << i): 
+            factory.create_model(1 << i)
+            factory.train_evaluate(data) 
+    
     print("Training complete!")
 
 def moodel_selection():
@@ -111,7 +123,13 @@ def moodel_selection():
     return choice
 
 
+def prepare_data():
 
+    df = pd.read_csv("data\AppGallery.csv")
+    X = df[['Interaction content', 'Ticket Summary']].values  
+    data = Data(X, df) 
+
+    return data
 
 # bullshit for testing
 def train_model1():
@@ -128,3 +146,4 @@ def train_model4():
 
 def train_model5():
     print("model 5 trained!!!!")
+

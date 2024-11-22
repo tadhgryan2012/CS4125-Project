@@ -1,4 +1,4 @@
-from model.RandomForest import RandomForest
+#from model.RandomForest import RandomForest
 from modelling.data_model import Data
 import numpy as np
 

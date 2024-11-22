@@ -1,38 +1,27 @@
+from modelling.data_model import *
+from modelling.ModelFactory import *
+from CLI.timeFormatter import *
+from preprocess.preprocess import *
+import pandas as pd
 
-#class Email:
-#
- #   def __init__(self):
-#
- #       ticket_id = 0
-  #      interaction_id = 0
-#
- #       date_time_unformatted = ""
-  #      date_time_formatted = ""
-#
- #       mailbox = ""
-#
- #       ticket_summary = ""
-  #      interaction_content = ""
-   #     typology_ticket = ""
-
-#email = Email()
-
-#email.ticket_id = 1
 
 email_components = []
 
-def classificationProcess():
+columns = ['Ticket id','Interaction id','Interaction date','Mailbox','Ticket Summary','Interaction content','Innso TYPOLOGY_TICKET']
+
+def create_df_from_input():
 
 
     print("If you do not have the information for a question, leave it blank and hit enter")
     
-    current_col = input("Enter the ticket ID : ")
+    current_col = int(input("Enter the ticket ID : "))
     email_components.append(current_col)
 
-    current_col = input("Enter the interaction ID : ")
+    current_col = int(input("Enter the interaction ID : "))
     email_components.append(current_col)
 
-    current_col = input("Enter the interaction date (YYYY-MM-DD-hh-mm-ss) : ")
+    current_col = str(input("Enter the interaction date (YYYY-MM-DD-hh-mm-ss) : "))
+    current_col = excel_serial_date(current_col)
     email_components.append(current_col)
 
     current_col = input("Enter the mailbox that recieved the email : ")
@@ -43,6 +32,11 @@ def classificationProcess():
     
     current_col = input("Enter the interaction content : ")
     email_components.append(current_col)
+
+    df = pd.DataFrame(email_components, columns=columns)
+
+    df = preprocess_data(df)
+    return df
 
 
 #Ticket id,Interaction id,Interaction date,Mailbox,Ticket Summary,Interaction content,Innso TYPOLOGY_TICKET
