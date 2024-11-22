@@ -31,7 +31,8 @@ class TranslationStrategy:
 
     def execute(self, df: pd.DataFrame) -> pd.DataFrame:
         print("Translating entries to English...")
-        df["translation for " + self.column] = self.translate(df)
+        temp = df.loc[(df["Interaction content"] != '') & (~df["Interaction content"].isna()),]
+        df["translation for " + self.column] = self.translate(temp)
         return df
 
     def translate(self, df: pd.DataFrame) -> pd.DataFrame:
