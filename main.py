@@ -2,7 +2,7 @@
 from preprocess.preprocess import *
 from embeddings import *
 # from modelling.modelling import *
-from modelling.ModelFactory import *
+from modelling.ModelFactory import ModelFactory
 from modelling.data_model import *
 from CLI.menus import *
 from CLI.timeFormatter import *
@@ -76,13 +76,13 @@ def get_data_object(X: np.ndarray, df: pd.DataFrame):
 
 
 
-def perform_modelling(bitmask: int, data: Data):
+def perform_modelling(bitmask: int, data: Data, retrain: bool = False):
     """
     Perform model prediction, evaluation, and optionally save predictions.
     """
     modelFactory = ModelFactory()
     modelFactory.create_model(bitmask)
-    modelFactory.train_evaluate(data)
+    modelFactory.train_evaluate(data, retrain=retrain)
     modelFactory.predict(data)
 
 def save_predictions(df, predictions, output_path="predictions.csv"):
@@ -109,3 +109,5 @@ if __name__ == '__main__':
     data = get_data_object(X, df)
     
     perform_modelling(0b111111, data)
+
+

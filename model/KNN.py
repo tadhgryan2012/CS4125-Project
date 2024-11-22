@@ -1,13 +1,17 @@
 from sklearn.neighbors import KNeighborsClassifier
 from model.base import BaseModel
+<<<<<<< HEAD
 from modelling.data_model import Data
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
 
+=======
+>>>>>>> main
 
 class KNN(BaseModel):
     def __init__(self, n_neighbors=5, metric='minkowski', p=2) -> None:
         super(KNN, self).__init__()
         self.model = KNeighborsClassifier(
+<<<<<<< HEAD
             n_neighbors=n_neighbors,  # Number of neighbors
             metric=metric,  # Distance metric ('minkowski' is default)
             p=p  # Power parameter for Minkowski metric (p=2 is Euclidean distance)
@@ -45,3 +49,10 @@ class KNN(BaseModel):
         self.predictions = self.model.predict(data.get_X_test())
         print(f"Predictions generated: {self.predictions}")
         return self.predictions
+=======
+            n_neighbors=n_neighbors,
+            metric=metric,
+            p=p
+        )
+        self.predictions = None
+>>>>>>> main

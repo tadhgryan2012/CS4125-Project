@@ -1,11 +1,15 @@
 from sklearn.naive_bayes import MultinomialNB
 from model.base import BaseModel
+<<<<<<< HEAD
 from modelling.data_model import Data
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+=======
+>>>>>>> main
 
 class NaiveBayes(BaseModel):
     def __init__(self, alpha=1.0) -> None:
         super(NaiveBayes, self).__init__()
+<<<<<<< HEAD
         self.model = MultinomialNB(alpha=alpha)  # Smoothing parameter
         self.predictions = None
 
@@ -46,3 +50,7 @@ class NaiveBayes(BaseModel):
         self.predictions = self.model.predict(data.get_X_test())
         print(f"Predictions generated: {self.predictions}")
         return self.predictions
+=======
+        self.model = MultinomialNB(alpha=alpha)
+        self.predictions = None
+>>>>>>> main
