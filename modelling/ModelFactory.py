@@ -46,7 +46,7 @@ class ModelFactory:
                 self.models.append(model_instance)
                 print(f"Created model: {model_instance.__class__.__name__}")
 
-    def train_evaluate(self, data: Data):
+    def train_evaluate(self, data: Data, print_results: bool = True):
         """
         Compiles, trains, and evaluates the model.
 
@@ -65,7 +65,7 @@ class ModelFactory:
         # Train and evaluate
         for model in self.models:
             print(f"Training and evaluating model: {model.__class__.__name__}")
-            model.train(data)
+            model.train(data, print_results)
 
     def predict(self, data: Data):
         """
@@ -81,5 +81,4 @@ class ModelFactory:
         predictions = {}
         for model in self.models:
             predictions[model.__class__.__name__] = model.predict(data)
-            print(f"Predictions for {model.__class__.__name__}: {predictions[model.__class__.__name__]}")
         return predictions

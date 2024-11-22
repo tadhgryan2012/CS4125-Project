@@ -67,7 +67,7 @@ def perform_modelling(bitmask: int, data: Data):
     """
     modelFactory = ModelFactory()
     modelFactory.create_model(bitmask)
-    modelFactory.train_evaluate(data)
+    modelFactory.train_evaluate(data, True)
     modelFactory.predict(data)
 
 def save_predictions(df, predictions, output_path="predictions.csv"):
