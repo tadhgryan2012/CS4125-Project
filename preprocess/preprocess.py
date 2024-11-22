@@ -1,6 +1,6 @@
 # Methods related to data loading and all pre-processing steps will go here
-from strategies import DeduplicationStrategy, NoiseRemovalStrategy, TranslationStrategy
-from decorators import LoggingDecorator
+from .strategies import DeduplicationStrategy, NoiseRemovalStrategy, TranslationStrategy
+from .decorators import LoggingDecorator
 from utils.interfaces import PreprocessStrategy
 
 class PreprocessPipeline:
@@ -19,5 +19,5 @@ def preprocess_data(df):
     pipeline = PreprocessPipeline()
     pipeline.add_strategy(LoggingDecorator(DeduplicationStrategy()))
     pipeline.add_strategy(LoggingDecorator(NoiseRemovalStrategy()))
-    pipeline.add_strategy(LoggingDecorator(TranslationStrategy()))
+    #pipeline.add_strategy(LoggingDecorator(TranslationStrategy()))
     return pipeline.execute(df)
