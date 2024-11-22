@@ -20,4 +20,11 @@ def preprocess_data(df):
     pipeline.add_strategy(LoggingDecorator(DeduplicationStrategy()))
     pipeline.add_strategy(LoggingDecorator(NoiseRemovalStrategy()))
     #pipeline.add_strategy(LoggingDecorator(TranslationStrategy()))
-    return pipeline.execute(df)
+
+    processed_data = pipeline.execute(df)
+
+    output_file = "data/AppGallery_processed.csv"
+    processed_data.to_csv(output_file, index=False)
+    print(f"Preprocessed data saved to {output_file}")
+
+    return processed_data
