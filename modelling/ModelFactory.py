@@ -1,12 +1,11 @@
 from model.RandomForest import RandomForest
-from model.LogisticRegression import LogisticRegression
+from model.LogisticRegression import LogisticRegressionModel
 from model.GradientBoosting import GradientBoosting
 from model.SVM import SVM
 from model.KNN import KNN
 from model.NaiveBayes import NaiveBayes
 
 from modelling.data_model import Data
-import numpy as np
 
 class ModelFactory:
     """A Singleton and Factory design pattern for classification models."""
@@ -20,32 +19,32 @@ class ModelFactory:
         return cls._instance
 
     def __init__(self):
-        # Maps bitmask to corresponding model
         self.model_map = {
-            0b001: RandomForest,
-            0b010: LogisticRegression,
-            0b011: SVM,
-            0b100: GradientBoosting,
-            0b101: KNN,
-            0b110: NaiveBayes,
-
+            0: RandomForest,
+            1: LogisticRegressionModel,
+            2: SVM,
+            3: GradientBoosting,
+            4: KNN,
+            5: NaiveBayes,
         }
-        self.model = None
+        self.models = []
 
     def create_model(self, bitmask):
         """
         Create a model based on the bitmask.
 
         Args:
-            bitmask (int): A binary bitmask to select the model.
+            bitmask (int): A binary bitmask to where each bit corresponds to a model.
 
         Returns:
-            model: An untrained model instance.
+            model list: Of the models selected in the bitmask
         """
-        if bitmask not in self.model_map:
-            raise ValueError(f"Invalid bitmask {bin(bitmask)}. Available models: {list(self.model_map.keys())}")
-        self.model = self.model_map[bitmask]()
-        print(f"Created model: {self.model.__class__.__name__}")
+        self.models = []
+        for bit_position, model_class in self.model_map.items():
+            if bitmask & (1 << bit_position):
+                model_instance = model_class()
+                self.models.append(model_instance)
+                print(f"Created model: {model_instance.__class__.__name__}")
 
     def train_evaluate(self, data: Data):
         """
@@ -60,11 +59,13 @@ class ModelFactory:
         Returns:
             float: Accuracy score on the test data.
         """
-        if self.model is None:
+        if self.models is None:
             raise ValueError("No model created. Use 'create_model' first.")
 
         # Train and evaluate
-        self.model.train(data)
+        for model in self.models:
+            print(f"Training and evaluating model: {model.__class__.__name__}")
+            model.train(data)
 
     def predict(self, data: Data):
         """
@@ -76,8 +77,9 @@ class ModelFactory:
         Returns:
             np.ndarray: Predicted labels.
         """
-        if self.model is None:
-            raise ValueError("No model created. Use 'create_model' first.")
-        predictions = self.model.predict(data)
-        print(f"Predictions: {predictions}")
+
+        predictions = {}
+        for model in self.models:
+            predictions[model.__class__.__name__] = model.predict(data)
+            print(f"Predictions for {model.__class__.__name__}: {predictions[model.__class__.__name__]}")
         return predictions
