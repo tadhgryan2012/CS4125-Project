@@ -68,6 +68,8 @@ class ModelFactory:
             model.train(data, save_path=save_path, retrain=retrain,  print_results=print_results)
 
     def predict(self, data: Data):
+
+        print("dfhjfdsjfdjdfs")
         """
         Makes predictions using the trained model.
 
@@ -81,4 +83,6 @@ class ModelFactory:
         predictions = {}
         for model in self.models:
             predictions[model[0].__class__.__name__] = model[0].predict(data)
+
+        print(predictions)
         return predictions

@@ -15,7 +15,7 @@ class PreprocessPipeline:
             df = strat.execute(df)
         return df
 
-def preprocess_data(df, strategy):
+def preprocess_data(df, strategy, file_name):
     pipeline = PreprocessPipeline()
 
     for strat in strategy:
@@ -23,7 +23,7 @@ def preprocess_data(df, strategy):
 
     processed_data = pipeline.execute(df)
 
-    output_file = "data/AppGallery_processed.csv"
+    output_file = f"data/{file_name}_processed.csv"
     processed_data.to_csv(output_file, index=False)
     print(f"Preprocessed data saved to {output_file}")
 

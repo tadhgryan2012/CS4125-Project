@@ -4,11 +4,17 @@ from embeddings import *
 # from modelling.modelling import *
 from modelling.ModelFactory import ModelFactory
 from modelling.data_model import *
+from CLI.menus import *
+from CLI.timeFormatter import *
 import random
 from sklearn.feature_extraction.text import TfidfVectorizer
+
 seed = 0
 random.seed(seed)
 np.random.seed(seed)
+
+excel_serial_date("2024-01-01-01-01-01")
+main_menu() 
 
 def de_duplication(df: pd.DataFrame):
     """Remove duplicate rows."""
@@ -43,6 +49,15 @@ def get_tfidf_embd(df: pd.DataFrame):
 def load_data():
     print("get_input_data()")
     data = pd.read_csv('data/AppGallery.csv')
+    return data
+
+def load_original_data():
+    print("get_input_data()")
+    data = pd.read_csv('data/AppGallery.csv')
+    return data
+
+def load_processed_data():
+    data = pd.read_csv('data/AppGallery_processed.csv')
     return data
 
 def get_embeddings(df:pd.DataFrame):
@@ -94,5 +109,3 @@ if __name__ == '__main__':
     data = get_data_object(X, df)
     
     perform_modelling(0b111111, data)
-
-

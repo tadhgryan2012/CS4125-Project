@@ -21,19 +21,7 @@ class BaseModel(ABC):
         :param print_results: Whether to print evaluation metrics.
         :return: Tuple containing evaluation metrics (accuracy, precision, recall, f1, classification_report, confusion_matrix).
         """
-        # Check if a pre-trained model already exists
-        if not retrain and os.path.exists(save_path):
-            print(f"Loading existing model from {save_path}...")
-            self.model = joblib.load(save_path)
-        else:
-            print("Training new model...")
-            # Train the model
-            self.model.fit(data.get_X_train(), data.get_type_y_train())
-
-            # Save the trained model
-            os.makedirs(os.path.dirname(save_path), exist_ok=True)
-            joblib.dump(self.model, save_path)
-            print(f"Model saved to {save_path}")
+        self.getPretrainedModel(data, retrain, save_path)
 
         # Evaluate the model
         y_pred = self.model.predict(data.get_X_test())
@@ -60,13 +48,29 @@ class BaseModel(ABC):
         
         return accuracy, precision, recall, f1, cr, cm
 
-    def predict(self, data: Data):
+    def predict(self, data: Data, retrain: bool = False, save_path: str = "data/models/trained_model.pkl"):
         """
         Predicts using the model on the data specified.
         """
+        self.getPretrainedModel(data, retrain, save_path)
         if self.model is None:
             raise ValueError("The model has not been trained yet. Train the model before calling predict().")
 
         self.predictions = self.model.predict(data.get_X_test())
         return self.predictions
 
+    def getPretrainedModel(self, data: Data, retrain: bool, save_path: str):
+        # Check if a pre-trained model already exists
+        if not retrain and os.path.exists(save_path):
+            print(f"Loading existing model from {save_path}...")
+            self.model = joblib.load(save_path)
+        else:
+            print("Training new model...")
+            # Train the model
+            self.model.fit(data.get_X_train(), data.get_type_y_train())
+
+            # Save the trained model
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            joblib.dump(self.model, save_path)
+            print(f"Model saved to {save_path}")
+        
