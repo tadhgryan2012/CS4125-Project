@@ -47,13 +47,13 @@ def preprocess_menu():
         match choice:
             case 1: 
                 strategy = [NoiseRemovalStrategy()]
-                df = preprocess_data(df, strategy)
+                df = preprocess_data(df, strategy,"AppGallery")
             case 2: 
                 strategy = [DeduplicationStrategy()]
-                df = preprocess_data(df, strategy)
+                df = preprocess_data(df, strategy,"AppGallery")
             case 3: 
                 strategy = [TranslationStrategy()]
-                df = preprocess_data(df, strategy)
+                df = preprocess_data(df, strategy,"AppGallery")
             case 4:
                 run = False
             case _:
@@ -101,21 +101,24 @@ def train_choice(choice_bitmask):
 
 def classify_menu():
     print("\nClassify Email Menu")
-    print("1) Start email classification process")
-    print("2) Back to main menu")
+    print("1) Classify single email")
+    print("2) Classify group of emails")
+    print("3) Back to main menu")
     try:
         choice = int(input("Enter your choice : "))
         match choice:
             case 1: 
                 create_df_from_input()
             case 2:
+                choice = moodel_selection()
+                bitChoice = choice_to_bitmask(choice)
+                classify_group(bitChoice)
+            case 3:
                 main_menu()
             case _:
                 print("Not a valid choice! Try again. (1,2,3): ")
     except ValueError:
-            print("Invalid input! Please enter a number. (1,2,3)")
-
-
+            print("????????????????")
 
 def valid_choices(choice):
     if not choice.strip():
@@ -135,8 +138,6 @@ def choice_to_bitmask(choice_str):
         bitmask |= (1 << (pos - 1))
 
     return bitmask
-
-
 
 def moodel_selection():
 
@@ -163,8 +164,6 @@ def moodel_selection():
 
     return choice
 
-
-
 def load_data():
     file_path = 'data/AppGallery_processed.csv'
 
@@ -184,6 +183,10 @@ def load_original_data():
 
 def load_processed_data():
     data = pd.read_csv('data/AppGallery_processed.csv')
+    return data
+
+def load_unclassified_data():
+    data = pd.read_csv('data/To_Classify.csv')
     return data
 
 def get_embeddings(df:pd.DataFrame):
