@@ -74,7 +74,7 @@ def train_menu():
 
         if "7" in choice.split():
             print("Training all models...")
-            train_choice(0b11111)  # All bits set
+            train_choice(0b111111)  # All bits set
             continue
         
         choice_bitmask = choice_to_bitmask(choice)
@@ -84,19 +84,18 @@ def train_menu():
 def train_choice(choice_bitmask):
 
     df = load_data()
-
     X,df = get_embeddings(df)
 
+    df = df.reset_index(drop=True)
     data = get_data_object(X,df)
 
     factory = ModelFactory() 
 
-    for i in range(5):
-        print(i)
+    for i in range(6):
         if choice_bitmask & (1 << i): 
             print(f"Training Model {i + 1}...")
             factory.create_model(1 << i)
-            factory.train_evaluate(data) 
+            factory.train_evaluate(data, False) 
     
     print("Training complete!")
 
@@ -135,8 +134,6 @@ def choice_to_bitmask(choice_str):
     for pos in positions:
         bitmask |= (1 << (pos - 1))
 
-    print(bitmask)
-
     return bitmask
 
 
@@ -172,11 +169,11 @@ def load_data():
     file_path = 'data/AppGallery_processed.csv'
 
     if os.path.exists(file_path):
-        print("Loading from processed dataframe")
+        print("\nLoading from processed dataframe")
         df = load_processed_data()
     else:
         df = load_original_data()
-        print("Loading from original dataframe")
+        print("\nLoading from original dataframe")
 
     return df
 
@@ -202,22 +199,3 @@ def get_embeddings(df:pd.DataFrame):
 
 def get_data_object(X: np.ndarray, df: pd.DataFrame):
     return Data(X, df)
-
-
-
-# bullshit for testing
-def train_model1():
-    print("model 1 trained!!!!")
-
-def train_model2():
-    print("model 3 trained!!!!")
-
-def train_model3():
-    print("model 3 trained!!!!")
-
-def train_model4():
-    print("model 4 trained!!!!")
-
-def train_model5():
-    print("model 5 trained!!!!")
-

@@ -68,7 +68,7 @@ def get_embeddings(df:pd.DataFrame):
     df = df[valid_indices]
     X = vectorizer.fit_transform(df[Config.INTERACTION_CONTENT].fillna('')).toarray()
     
-    print(f"Embeddings shape: {X.shape}, DataFrame shape: {df.shape}")
+    #print(f"Embeddings shape: {X.shape}, DataFrame shape: {df.shape}")
     return X, df
 
 def get_data_object(X: np.ndarray, df: pd.DataFrame):
