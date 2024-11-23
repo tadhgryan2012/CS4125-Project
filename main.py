@@ -109,5 +109,3 @@ if __name__ == '__main__':
     data = get_data_object(X, df)
     
     perform_modelling(0b111111, data)
-
-

@@ -309,3 +309,4 @@ pyrightconfig.json
 
 # Models
 data/models
+data/*_processed.csv
