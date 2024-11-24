@@ -19,7 +19,7 @@ class Util:
 
     @staticmethod
     def get_embeddings(df: pd.DataFrame):
-        vectorizer_path = '../data/vectorizer.pkl'
+        vectorizer_path = 'data/vectorizer.pkl'
 
         if Config.INTERACTION_CONTENT in df.columns:
             valid_indices = df[Config.INTERACTION_CONTENT].notnull()
@@ -30,51 +30,30 @@ class Util:
         if df.empty:
             raise ValueError("No valid rows in dataframe to process.")
 
-        if os.path.exists('../data/vectorizer.pkl'):
-            with open('../data/vectorizer.pkl', 'rb') as file:
+        if os.path.exists(vectorizer_path):
+            with open(vectorizer_path, 'rb') as file:
                 loaded_vectorizer = pickle.load(file)
             X = loaded_vectorizer.transform(df[Config.INTERACTION_CONTENT].fillna('')).toarray()
         else:
             vectorizer = TfidfVectorizer()
             X = vectorizer.fit_transform(df[Config.INTERACTION_CONTENT].fillna('')).toarray()
-            with open('data/vectorizer.pkl', 'wb') as file:
+            with open(vectorizer_path, 'wb') as file:
                 pickle.dump(vectorizer, file)
 
         print(f"Embeddings shape: {X.shape}, DataFrame shape: {df.shape}")
         return X, df
 
-    @classmethod
-    def load_data(cls, filename: str):
-        data : pd.DataFrame
-        filename_used = "AppGallery"
-        if (filename == ""):
-            print("loading original training data")
-            data = cls.load_data_disk(filename_used, True)
-        elif (os.path.exists(filename)):
-            if (filename.endswith(".csv")):
-                filename_used = re.split(r"[/, \ ]", filename)[-1].split(".")[0]
-                data = cls.load_data_disk(filename)
-            else:
-                print("File that you provided is not a CSV file.")
-                print("Loading original training data.")
-                data = cls.load_data_disk(filename_used, True)
+    @staticmethod
+    def get_data(filename: str = "", default_path: str = 'data/AppGallery.csv'):
+        if (filename):
+            if os.path.exists(filename) and filename.endswith(".csv"):
+                print(f"Using data: {filename}")
+                return pd.read_csv(filename)
+            else: FileNotFoundError(f"The file '{filename}' does not exist or is not a valid .csv file.")
         else:
-            print("File that you provided does not exist.")
-            print("Loading original training data.")
-            data = cls.load_data_disk(filename_used, True)
-
-        return data, filename_used
-
-    @staticmethod
-    def load_processed_data(filename: str) -> DataFrame:
-        filename = f"data/{filename}_processed.csv"
-        data = pd.read_csv(filename)
-        return data
-    #
-    @staticmethod
-    def load_data_disk(filename: str, convert: bool = False) -> DataFrame:
-        filename = f"data/{filename}.csv" if convert else filename
-        data = pd.read_csv(filename)
-        return data
-
-
+            if os.path.exists(default_path.replace('.csv', '_processed.csv')):
+                print(f"Using data: {default_path.replace('.csv', '_processed.csv')}")
+                return pd.read_csv(default_path.replace('.csv', '_processed.csv'))
+            else:
+                print(f"Using data: {default_path}")
+                return pd.read_csv(default_path)

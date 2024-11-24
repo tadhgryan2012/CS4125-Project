@@ -46,8 +46,8 @@ class TranslationStrategy:
 
         text_en_l = []
         for text in df[self.column]:
-            if text == "":
-                text_en_l = text_en_l + [text]
+            if pd.isna(text) or text == "":
+                text_en_l = text_en_l + [""]
                 continue
 
             doc = nlp_stanza(text)
