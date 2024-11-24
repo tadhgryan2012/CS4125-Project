@@ -11,7 +11,7 @@ class BaseModel(ABC):
         """
         self.model = None
 
-    def train(self, data: Data, save_path: str = "data/models/trained_model.pkl", retrain: bool = False, print_results: bool = True) -> tuple:
+    def train(self, data: Data, save_path: str, retrain: bool = False, print_results: bool = True) -> tuple:
         """
         Train the model using ML Models for Multi-class and multi-label classification.
         If a saved model exists, it is loaded instead of training a new one.
@@ -48,7 +48,7 @@ class BaseModel(ABC):
         
         return accuracy, precision, recall, f1, cr, cm
 
-    def predict(self, data: Data, retrain: bool = False, save_path: str = "data/models/trained_model.pkl"):
+    def predict(self, data: Data, save_path: str, retrain: bool = False):
         """
         Predicts using the model on the data specified.
         """
@@ -61,7 +61,7 @@ class BaseModel(ABC):
 
     def getPretrainedModel(self, data: Data, retrain: bool, save_path: str):
         # Check if a pre-trained model already exists
-        if not retrain and os.path.exists(save_path):
+        if (not retrain) and os.path.exists(save_path):
             print(f"Loading existing model from {save_path}...")
             self.model = joblib.load(save_path)
         else:

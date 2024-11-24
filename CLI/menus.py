@@ -1,45 +1,41 @@
 import os
-from CLI.classification_process import *
+import pickle
 from modelling.data_model import *
 from modelling.ModelFactory import *
 from preprocess import *
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+from preprocess.preprocess import preprocess_data
+from preprocess.strategies import DeduplicationStrategy, NoiseRemovalStrategy, TranslationStrategy
+
 def main_menu():
-    
-    run = True
-    
-    while run:
+    while True:
         print("\nMain Menu")
         print("1) Preprocess the Data")
         print("2) Train a model")
-        print("3) Classify an email")
+        print("3) Classify emails")
         print("4) Exit")
-        try:
-            choice = int(input("Enter your choice : "))
-            match choice:
-                case 1: 
-                    preprocess_menu()
-                case 2:
-                    train_menu()
-                case 3:
-                    classify_menu()
-                case 4:
-                    run = False
-                case _:
-                    print("Not a valid choice! Try again. (1,2,3): ")
-        except ValueError:
-            print("WTF")
+        choice = int(input("Enter your choice : "))
+        match choice:
+            case 1: 
+                preprocess_menu()
+            case 2:
+                train_menu()
+            case 3:
+                classify_menu()
+            case 4:
+                break
+            case _:
+                print("Not a valid choice! Try again. (1,2,3): ")
 
 def preprocess_menu():
-    run = True
-    while run:
+    while True:
         print("\nPreprocess Menu")
         print("preprocess strategies to add:")
-        print("1) Noise Removal")
-        print("2) Deduplication Removal")
-        print("3) Translation")
-        print("4) Back to main menu")
+        print("\t1) Noise Removal")
+        print("\t2) Deduplication Removal")
+        print("\t3) Translation")
+        print("\t4) Back to main menu")
 
         df = load_data()
 
@@ -55,39 +51,35 @@ def preprocess_menu():
                 strategy = [TranslationStrategy()]
                 df = preprocess_data(df, strategy,"AppGallery")
             case 4:
-                run = False
+                break
             case _:
                 print("Not a valid choice! Try again. (1,2,3): ")
 
-
 def train_menu():
-    run = True
-    while run:
+    while True:
         print("\nTrain Menu")
         print("Models you can train:")
 
         choice = moodel_selection()
 
         if "8" in choice.split():
-            run = False
-            continue
+            break
 
         if "7" in choice.split():
             print("Training all models...")
             train_choice(0b111111)  # All bits set
             continue
-        
+
         choice_bitmask = choice_to_bitmask(choice)
         train_choice(choice_bitmask)
         main_menu()
 
 def train_choice(choice_bitmask):
-
     df = load_data()
-    X,df = get_embeddings(df)
+    X, df = get_embeddings(df)
 
     df = df.reset_index(drop=True)
-    data = get_data_object(X,df)
+    data = get_data_object(X, df)
 
     factory = ModelFactory() 
 
@@ -100,25 +92,20 @@ def train_choice(choice_bitmask):
     print("Training complete!")
 
 def classify_menu():
-    print("\nClassify Email Menu")
-    print("1) Classify single email")
-    print("2) Classify group of emails")
-    print("3) Back to main menu")
-    try:
+    while True:
+        print("\nClassify Email Menu")
+        print("1) Classify group of emails")
+        print("2) Back to main menu")
         choice = int(input("Enter your choice : "))
         match choice:
-            case 1: 
-                create_df_from_input()
-            case 2:
+            case 1:
                 choice = moodel_selection()
                 bitChoice = choice_to_bitmask(choice)
                 classify_group(bitChoice)
-            case 3:
-                main_menu()
+            case 2:
+                break
             case _:
                 print("Not a valid choice! Try again. (1,2,3): ")
-    except ValueError:
-            print("????????????????")
 
 def valid_choices(choice):
     if not choice.strip():
@@ -140,10 +127,7 @@ def choice_to_bitmask(choice_str):
     return bitmask
 
 def moodel_selection():
-
-    run = True
-    while run:
-
+    while True:
         print("1) Random Forest")
         print("2) Logistic Regression")
         print("3) SVM")
@@ -159,8 +143,7 @@ def moodel_selection():
             print("Invalid input! Please enter numbers between 1 and 7 separated by spaces. or 8 on its own")
             continue
     
-        run = False
-
+        break
 
     return choice
 
@@ -190,15 +173,51 @@ def load_unclassified_data():
     return data
 
 def get_embeddings(df:pd.DataFrame):
-    vectorizer = TfidfVectorizer()
-
-    # Generate embeddings only for non-null rows
-    valid_indices = df[Config.INTERACTION_CONTENT].notnull()
-    df = df[valid_indices]
-    X = vectorizer.fit_transform(df[Config.INTERACTION_CONTENT].fillna('')).toarray()
+    vectorizer_path = 'data/vectorizer.pkl'
     
+    if Config.INTERACTION_CONTENT in df.columns:
+        valid_indices = df[Config.INTERACTION_CONTENT].notnull()
+        df = df[valid_indices]
+    else:
+        raise KeyError(f"Column {Config.INTERACTION_CONTENT} not found in dataframe.")
+
+    if df.empty:
+        raise ValueError("No valid rows in dataframe to process.")
+    
+    if os.path.exists('data/vectorizer.pkl'):
+        with open('data/vectorizer.pkl', 'rb') as file:
+            loaded_vectorizer = pickle.load(file)
+        X = loaded_vectorizer.transform(df[Config.INTERACTION_CONTENT].fillna('')).toarray()
+    else:
+        vectorizer = TfidfVectorizer()
+        X = vectorizer.fit_transform(df[Config.INTERACTION_CONTENT].fillna('')).toarray()
+        with open('data/vectorizer.pkl', 'wb') as file:
+            pickle.dump(vectorizer, file)
+
     print(f"Embeddings shape: {X.shape}, DataFrame shape: {df.shape}")
     return X, df
 
-def get_data_object(X: np.ndarray, df: pd.DataFrame):
-    return Data(X, df)
+def get_data_object(X: np.ndarray, df: pd.DataFrame, prediction: bool = False):
+    return Data(X, df, prediction)
+
+def classify_group(choice_bitmask):
+    df = load_unclassified_data()
+
+    strategy = [NoiseRemovalStrategy()]
+    df = preprocess_data(df, strategy, "To_Classify")
+                
+    strategy = [DeduplicationStrategy()]
+    df = preprocess_data(df, strategy, "To_Classify")
+    
+    X, df = get_embeddings(df)
+    df = df.reset_index(drop=True)
+    data = get_data_object(X, df, prediction=True)
+
+    factory = ModelFactory()
+
+    for i in range(6):
+        if choice_bitmask & (1 << i): 
+            print(f"Evaluating Emails {i + 1}...")
+            factory.create_model(1 << i)
+            pred = factory.predict(data)
+            print(pred)
