@@ -1,8 +1,13 @@
 from abc import ABC
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report, confusion_matrix
+
+from Config import Config
 from modelling.data_model import Data
 import os
 import joblib
+
+from utils.Util import Util
+
 
 class BaseModel(ABC):
     def __init__(self) -> None:
@@ -11,7 +16,7 @@ class BaseModel(ABC):
         """
         self.model = None
 
-    def train(self, data: Data, save_path: str, retrain: bool = False, print_results: bool = True) -> tuple:
+    def train(self, data: Data, save_path: str, retrain: bool = False, print_results: bool = True, filename: str = "data/AppGallery.csv") -> tuple:
         """
         Train the model using ML Models for Multi-class and multi-label classification.
         If a saved model exists, it is loaded instead of training a new one.
@@ -59,7 +64,7 @@ class BaseModel(ABC):
         self.predictions = self.model.predict(data.get_X_test())
         return self.predictions
 
-    def getPretrainedModel(self, data: Data, retrain: bool, save_path: str):
+    def getPretrainedModel(self, data: Data, retrain: bool, save_path: str, filename: str = "To_Classify"):
         # Check if a pre-trained model already exists
         if (not retrain) and os.path.exists(save_path):
             print(f"Loading existing model from {save_path}...")
@@ -67,6 +72,12 @@ class BaseModel(ABC):
         else:
             print("Training new model...")
             # Train the model
+            df_origin = Util.load_processed_data("AppGallery")
+
+            X, df = Util.get_embeddings(df_origin)
+            df = df.reset_index(drop=True)
+            data = Util.get_data_object(X, df)
+
             self.model.fit(data.get_X_train(), data.get_type_y_train())
 
             # Save the trained model
